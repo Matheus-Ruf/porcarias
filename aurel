@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+void escreve_vet(int v[], int64_t tam)
+{
+    int x;
+    for(int64_t i = 0; i < tam; i++)
+    {
+        scanf("%d", &x);
+        v[i] = x;
+    }
+    return;
+}
+
+void imprime_vet(int v[], int64_t tam)
+{
+    for(int64_t i = 0; i < tam; i++)
+        printf("%d ", v[i]);
+    printf("\n");
+    return;
+}
+
+void troca(int v[], int64_t a, int64_t b)
+{
+    int t;
+    t = v[a];
+    v[a] = v[b];
+    v[b] = t;
+    return;
+}
+
+////////////////////////////////////////////////////////
+
+int64_t esquerda(int64_t i)
+{
+    return  (i << 1) + 1;
+}
+
+int64_t direita(int64_t i)
+{
+    return  (i << 1) + 1 + 1;
+}
+
+void max_heapify(int h[], int64_t i, int64_t n, uint64_t *comp) //junta dois max-heaps com um noh e o transforma em um max-heap
+{//
+    int64_t l, r, maior;
+    
+    l = esquerda(i);
+    r = direita(i);
+    
+    if(l <= n-1) //pega o maior entre i e l (se tiver)
+    {
+        (*comp)++;
+        if(h[l] > h[i])	//if separado para comp++
+       		maior = l;
+    }
+    else
+    {   maior = i;}
+    
+    if(r <= n-1)
+    {
+    	(*comp)++;
+    	if(h[r] > h[maior])   //pega o maior entre maior i, l e r (se tiver)
+        	maior = r;
+    }
+    
+    if(maior != i)  //se for necessario trocar nos de lugar
+    {
+        troca(h, i, maior);
+        max_heapify(h, maior, n, comp);   //se caso a troca estragou o sub max-heap isso a concertara
+    }
+    
+    return;
+}
+
+void construir_max_heap(int v[], int64_t n, uint64_t *comp)
+{
+    for(int64_t i = (n/2) - 1; i >= 1; i--)
+        max_heapify(v, i, n, comp);   //começa da ultima folha até a raiz
+    return;
+}
+/////////////////////////
+void HeapSort(int v[], int64_t n, uint64_t *comp)
+{
+    int64_t i;
+    
+    construir_max_heap(v, n, comp);
+    for(i = n - 1; i >= 2; i--)
+    {
+        troca(v, 0, i);
+        max_heapify(v, 0, i-1, comp);
+    }
+    return;
+}
+
+uint64_t heapSort(int vetor[], size_t tam)
+{
+    uint64_t *numComparacoes;
+    
+    *numComparacoes = 0;
+    
+    HeapSort(vetor, tam, numComparacoes);
+    return *numComparacoes;
+}
+/////////////////////////
+int main()
+{
+    uint64_t *comp;
+    int64_t tam;
+    scanf("%ld", &tam);
+    int* v = (int*) malloc(tam * sizeof(int));
+    printf("chegou 1\n");
+    escreve_vet(v, tam);
+    printf("chegou 2\n");
+    
+    *comp = heapSort(v, tam);
+    
+    //troca(v, 0, 1);
+    int64_t i; scanf("%ld", &i); //printf("%ld < %ld > %ld\n", esquerda(i), i, direita(i));
+    max_heapify(v, i, tam, comp);
+    
+    printf("chegou 3\n");
+    imprime_vet(v, tam);
+    printf("comparacoes: %ld\n", *comp);
+    
+    return 0;
+}
